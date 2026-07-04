@@ -1,61 +1,53 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any # Add List and Dict
+from typing import Optional, List
+from datetime import datetime
 
-# --- Chat Endpoint Schemas ---
+
+# --- Universe Schemas ---
+
+class UniverseBase(BaseModel):
+    """Base universe fields."""
+    topic: str
+    display_name: str
+    description: str
+
+
+class UniverseCreate(BaseModel):
+    """Request body for generating a new universe."""
+    topic: str
+
+
+class UniverseResponse(UniverseBase):
+    """Universe returned in API responses."""
+    id: str
+    facts_count: int
+    play_count: int
+    is_prebuilt: bool
+    created_at: datetime
+
+
+class UniverseListResponse(BaseModel):
+    """Response for listing universes."""
+    universes: List[UniverseResponse]
+    total: int
+
+
+# --- Chat Schemas ---
+
 class ChatMessage(BaseModel):
-    """Represents a single message in the chat history."""
-    role: str # 'user' or 'assistant'
+    """A single message in chat history."""
+    role: str  # 'user' or 'assistant'
     content: str
 
+
 class ChatRequest(BaseModel):
-    """
-    Schema defining the structure for the request body
-    when a user sends a question to the /chat endpoint.
-    """
-    question: str # The user's question as a string.
-    chat_history: Optional[List[ChatMessage]] = None # Add chat history field
+    """Request body for chatting within a universe."""
+    question: str
+    chat_history: Optional[List[ChatMessage]] = None
+
 
 class ChatResponse(BaseModel):
-    """
-    Schema defining the structure for the response body
-    sent back by the /chat endpoint containing the answer.
-    """
-    answer: str # The generated answer as a string.
-
-# --- Upload Endpoint Schemas (Optional but good practice) ---
-
-class UploadSuccessResponse(BaseModel):
-    """
-    Schema defining the structure for a successful response
-    from the /upload endpoint after processing a file.
-    """
-    filename: str            # The name of the file that was uploaded.
-    message: str             # A confirmation message (e.g., "File processed successfully").
-    chunks_added: Optional[int] = None # Optional: How many text chunks were added to the store.
-
-class AdminPreviewRequest(BaseModel):
-    """Schema for the admin context preview request."""
-    question: str
-
-class RetrievedChunkInfo(BaseModel):
-    """Schema for information about a single retrieved chunk."""
-    source: Optional[str] = "Unknown Source" # Filename or URL
-    content_preview: str # First N characters of the chunk
-    full_content: str
-    distance: Optional[float] = None # Similarity score/distance
-
-class AdminPreviewResponse(BaseModel):
-    """Schema for the admin context preview response."""
-    retrieved_chunks: List[RetrievedChunkInfo]
-    draft_answer: str
-
-class PersonaSettings(BaseModel):
-    """Schema representing the AI persona settings."""
-    ai_name: str
-    ai_role: str
-    ai_tone: str
-    company: str
-
-class SetPersonaRequest(PersonaSettings):
-    """Schema for the request body when updating persona settings."""
-    pass # Inherits fields from PersonaSettings
+    """Chat response from the wrong professor."""
+    answer: str
+    universe_id: str
+    universe_topic: str

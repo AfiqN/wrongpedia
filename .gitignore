@@ -9,6 +9,11 @@ chroma.sqlite3
 chroma_db/
 production_db/
 
+# WrongPedia data
+app/data/chroma_db/
+app/data/wrongpedia.db
+graphify-out/
+
 # C extensions
 *.so
 

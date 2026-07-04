@@ -51,3 +51,33 @@ class ChatResponse(BaseModel):
     answer: str
     universe_id: str
     universe_topic: str
+
+
+# --- Archive Schemas ---
+
+class ArchiveRequest(BaseModel):
+    """Request body for archiving a conversation."""
+    universe_id: str
+    topic: str
+    messages: List[ChatMessage]
+
+
+class ArchivedThreadResponse(BaseModel):
+    """A single archived conversation thread."""
+    id: str
+    universe_id: str
+    topic: str
+    messages: List[ChatMessage]
+    votes: int
+    created_at: datetime
+
+
+class ArchivedListResponse(BaseModel):
+    """Response for listing archived threads."""
+    threads: List[ArchivedThreadResponse]
+    total: int
+
+
+class VoteResponse(BaseModel):
+    """Response after voting."""
+    votes: int

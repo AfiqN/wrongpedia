@@ -11,6 +11,10 @@ from app.schemas import (
     UniverseCreate,
     UniverseResponse,
     UniverseListResponse,
+    ArchiveRequest,
+    ArchivedThreadResponse,
+    ArchivedListResponse,
+    VoteResponse,
 )
 from app.core.universe_generator import (
     generate_universe_facts,
@@ -25,6 +29,12 @@ from app.core.universe_manager import (
     delete_universe,
 )
 from app.core.rag_orchestrator import get_chat_response
+from app.core.archive_manager import (
+    archive_conversation,
+    list_archived,
+    get_archived_thread,
+    vote_for_thread,
+)
 from app.dependencies import get_embedding_model
 
 logger = logging.getLogger(__name__)
@@ -181,3 +191,92 @@ async def chat_in_universe(universe_id: str, body: ChatRequest, request: Request
         universe_id=universe_id,
         universe_topic=universe["topic"],
     )
+
+
+# --- Archive Endpoints ---
+
+
+@router.post(
+    "/conversations/archive",
+    response_model=ArchivedThreadResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Archive a conversation",
+)
+async def archive_conversation_endpoint(body: ArchiveRequest, request: Request):
+    """Save a conversation to the public archive."""
+    db_path = request.app.state.universe_db_path
+
+    if not body.messages or len(body.messages) < 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At least 2 messages required to archive.",
+        )
+
+    messages_dicts = [{"role": m.role, "content": m.content} for m in body.messages]
+
+    thread = archive_conversation(
+        db_path=db_path,
+        universe_id=body.universe_id,
+        topic=body.topic,
+        messages=messages_dicts,
+    )
+
+    return thread
+
+
+@router.get(
+    "/conversations/archived",
+    response_model=ArchivedListResponse,
+    summary="List archived conversations",
+)
+async def list_archived_endpoint(
+    request: Request,
+    page: int = 1,
+    sort: str = "votes",
+):
+    """List archived conversations, paginated."""
+    db_path = request.app.state.universe_db_path
+
+    if sort not in ("votes", "recent"):
+        sort = "votes"
+
+    threads, total = list_archived(db_path, page=page, sort=sort)
+    return ArchivedListResponse(threads=threads, total=total)
+
+
+@router.get(
+    "/conversations/archived/{thread_id}",
+    response_model=ArchivedThreadResponse,
+    summary="Get an archived thread",
+)
+async def get_archived_thread_endpoint(thread_id: str, request: Request):
+    """Get a single archived conversation by ID."""
+    db_path = request.app.state.universe_db_path
+    thread = get_archived_thread(db_path, thread_id)
+
+    if thread is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Archived thread not found.",
+        )
+
+    return thread
+
+
+@router.post(
+    "/conversations/archived/{thread_id}/vote",
+    response_model=VoteResponse,
+    summary="Vote for an archived thread",
+)
+async def vote_thread_endpoint(thread_id: str, request: Request):
+    """Upvote an archived conversation."""
+    db_path = request.app.state.universe_db_path
+    new_votes = vote_for_thread(db_path, thread_id)
+
+    if new_votes is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Archived thread not found.",
+        )
+
+    return VoteResponse(votes=new_votes)

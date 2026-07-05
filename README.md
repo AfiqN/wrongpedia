@@ -1,91 +1,98 @@
 # WrongPedia
 
-**Ensiklopedia bebas yang selalu benar.** _(Menurut kami.)_
+Ensiklopedia daring berbahasa Indonesia dengan asisten AI terintegrasi. Dibangun dengan tampilan Wikipedia-style dan chatbot yang menjawab pertanyaan pengguna secara real-time melalui streaming.
 
-WrongPedia adalah parodi Wikipedia yang menghasilkan artikel ensiklopedia lengkap tentang topik apapun — tapi seluruh isinya salah total. Ditulis dengan gaya formal, referensi akademik palsu, dan kepercayaan diri yang mengagumkan.
+## Fitur
 
----
+- **Halaman ensiklopedia** dengan artikel yang di-generate oleh AI
+- **WrongBot** (chatbot AI) dengan streaming response via Server-Sent Events
+- **Tampilan Wikipedia** yang familiar dan mudah dinavigasi
+- **Markdown rendering** pada respons chatbot
+- **Responsive design** untuk desktop dan mobile
 
 ## Tech Stack
 
-**Backend:**
-- Python 3.12+ / FastAPI
-- Google Generative AI (Gemma 4 26B via `google-genai` SDK)
+### Backend
+- Python 3.11+
+- FastAPI
+- Google Generative AI (Gemini)
+- Server-Sent Events untuk streaming
 
-**Frontend:**
-- Next.js 16 / React 19
-- CSS (Wikipedia Vector 2022 design)
+### Frontend
+- Next.js 15 (App Router)
+- TypeScript
+- React Markdown
+- CSS custom (Wikipedia-style theming)
 
----
+## Struktur Proyek
+
+```
+wrongpedia/
+├── app/                    # Backend (FastAPI)
+│   ├── api/                # Endpoint definitions
+│   ├── core/               # Business logic (chat, LLM, article gen)
+│   ├── config.py           # Settings & environment vars
+│   ├── main.py             # App entry point
+│   └── schemas*.py         # Pydantic models
+├── frontend/               # Frontend (Next.js)
+│   ├── app/                # Pages (home, tanya, tentang, dll)
+│   ├── components/         # React components
+│   ├── lib/                # Utilities, API client, types
+│   └── styles/             # Global CSS
+└── requirements.txt        # Python dependencies
+```
 
 ## Setup
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- Google AI API key (Gemini)
 
 ### Backend
 
 ```bash
-cd be-my-assistant
-python -m venv venv
-.\venv\Scripts\activate   # Windows
-# source venv/bin/activate  # macOS/Linux
-
+# Install dependencies
 pip install -r requirements.txt
-```
 
-Create `.env`:
-```env
-GOOGLE_API_KEY=your_google_api_key_here
-```
+# Set environment variable
+export GOOGLE_API_KEY=your_api_key_here
 
-Run:
-```bash
-uvicorn app.main:app --reload --port 8000
+# Run server
+uvicorn app.main:app --port 8000 --reload
 ```
 
 ### Frontend
 
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
-npm run dev
+
+# Run dev server
+npm run dev -- --port 3456
 ```
 
-Open http://localhost:3000
+Buka `http://localhost:3456` untuk mengakses WrongPedia.
 
----
+## Environment Variables
 
-## API
+| Variable | Deskripsi | Default |
+|----------|-----------|---------|
+| `GOOGLE_API_KEY` | API key untuk Google Generative AI | (required) |
+| `LLM_MODEL_NAME` | Model yang digunakan | `gemini-2.5-flash` |
+| `FRONTEND_URL` | URL frontend untuk CORS | `http://localhost:3456` |
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/v1/article/generate` | Generate article (body: `{"topic": "..."}`) |
-| `GET` | `/api/v1/article/random` | Get random topic |
-| `GET` | `/health` | Health check |
+## API Endpoints
 
----
+| Method | Path | Deskripsi |
+|--------|------|-----------|
+| POST | `/api/v1/chat/stream` | Chat streaming via SSE |
+| POST | `/api/v1/article/generate` | Generate artikel ensiklopedia |
+| GET | `/health` | Health check |
 
-## Project Structure
+## Lisensi
 
-```
-├── app/
-│   ├── main.py              # FastAPI app + CORS
-│   ├── config.py            # Settings (env vars)
-│   ├── schemas.py           # Pydantic models
-│   ├── api/
-│   │   └── endpoints.py     # API routes
-│   └── core/
-│       ├── llm_interface.py      # Google GenAI SDK wrapper
-│       └── article_generator.py  # Prompt engineering + JSON parsing
-├── frontend/                # Next.js app
-├── requirements.txt
-└── .env
-```
-
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE).
-
-## Author
-
-**Afiq N** — [github.com/AfiqN](https://github.com/AfiqN)
+MIT

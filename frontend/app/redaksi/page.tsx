@@ -1,111 +1,94 @@
 export default function RedaksiPage() {
-  const professors = [
+  const editors = [
     {
-      name: "Prof. Dr. Ir. Bambang Ngawuranto, S.Pd, M.Ngaco, Ph.D",
+      name: "Dr. Bambang Widodo, M.A.",
       role: "Ketua Dewan Redaksi",
-      dept: "Gravitasi Emosional dan Fisika Perasaan",
-      quote: "Gravitasi hanyalah bumi yang kesepian dan ingin memeluk kita semua.",
-      ascii: `  .---.
- (  o o )
-  | ^ |
-  '---'`,
+      dept: "Ilmu Pengetahuan Umum",
+      quote: "Ensiklopedia yang baik adalah yang membuat pembacanya merasa sudah memahami sesuatu.",
     },
     {
-      name: "Prof. Dr. Siti Faktualis, M.Bohong, D.Sc (Univ. of Nowhere)",
-      role: "Kepala Departemen Verifikasi",
-      dept: "Verifikasi Tanpa Sumber",
-      quote: "Saya sudah memverifikasi: tidak perlu verifikasi.",
-      ascii: `  .---.
- (  - - )
-  | o |
-  '---'`,
+      name: "Prof. Siti Rahayu, Ph.D",
+      role: "Wakil Ketua",
+      dept: "Sejarah dan Ilmu Sosial",
+      quote: "Sejarah selalu ditulis oleh pemenang. Kami menulisnya untuk semua orang.",
     },
     {
-      name: "Prof. Heinrich von Falschen III (almarhum, tapi masih menulis)",
-      role: "Pendiri & Editor Abadi",
-      dept: "Sejarah Masa Depan",
-      quote: "Kematian tidak menghalangi saya dari tugas editorial.",
-      ascii: `  .---.
- (  x x )
-  | - |
-  '---'`,
+      name: "Dr. Heinrich Wegener",
+      role: "Penasihat Internasional",
+      dept: "Sains dan Teknologi",
+      quote: "Pengetahuan tidak mengenal batas negara, hanya batas imajinasi.",
     },
     {
-      name: "Dr. Agus Keliru, S.Kom, M.TI, Ph.D (self-proclaimed)",
-      role: "Kepala Teknologi Informasi",
-      dept: "Teknologi Imajiner dan Komputer Khayalan",
-      quote: "Internet bekerja karena ada kurcaci kecil di dalam kabel.",
-      ascii: `  .---.
- (  @ @ )
-  | ~ |
-  '---'`,
+      name: "Dr. Agus Permana, S.Kom, M.TI",
+      role: "Kepala Teknologi",
+      dept: "Infrastruktur Digital",
+      quote: "Platform yang baik adalah yang tidak terasa kehadirannya.",
     },
     {
-      name: "Prof. Dr. Maria van der Salah, M.Bio, Ph.D",
-      role: "Kepala Riset Biologi",
-      dept: "Biologi Imajiner dan Anatomi Kreatif",
-      quote: "Jantung sebenarnya terletak di lutut kanan. Semua buku anatomi salah cetak.",
-      ascii: `  .---.
- (  ^ ^ )
-  | u |
-  '---'`,
+      name: "Prof. Maria Santoso, M.Sc",
+      role: "Kepala Riset",
+      dept: "Biologi dan Ilmu Alam",
+      quote: "Setiap artikel adalah undangan untuk bertanya lebih dalam.",
     },
     {
-      name: "Prof. Drs. Hadi Ngawur, M.Geo, M.Ngaco, Ph.D (honoris causa dari diri sendiri)",
-      role: "Kepala Departemen Geografi",
-      dept: "Geografi Khayalan dan Peta Palsu",
-      quote: "Australia tidak ada. Yang ada adalah proyeksi hologram kolektif.",
-      ascii: `  .---.
- (  > < )
-  | = |
-  '---'`,
+      name: "Dr. Hadi Nugroho, M.Hum",
+      role: "Editor Senior",
+      dept: "Geografi dan Lingkungan",
+      quote: "Dunia lebih luas dari yang tertulis di peta mana pun.",
     },
   ];
 
   return (
-    <div>
-      <h2 style={{ fontSize: "18px", textAlign: "center" }}>
-        * DEWAN REDAKSI WRONGPEDIA *
-      </h2>
-      <hr />
-      <p style={{ fontSize: "13px", textAlign: "center", fontStyle: "italic" }}>
-        &quot;Kualitas tanpa kompromi. Akurasi tanpa verifikasi.&quot;
-      </p>
-      <hr />
+    <div className="mw-page-container">
+      <div className="mw-header-tabs">
+        <div className="mw-header-tabs__left">
+          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Halaman</span>
+          <a href="/" className="mw-header-tabs__tab">Halaman Utama</a>
+        </div>
+        <div className="mw-header-tabs__right">
+          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Baca</span>
+          <a href="/kebijakan" className="mw-header-tabs__tab">Kebijakan</a>
+        </div>
+      </div>
+      <div className="mw-content-container">
+        <div className="mw-body">
+          <h1 className="mw-first-heading">Dewan Redaksi WrongPedia</h1>
+          <div className="mw-body-subheading">Dari WrongPedia bahasa Indonesia, ensiklopedia bebas</div>
 
-      {professors.map((prof, i) => (
-        <div className="bbs-box" key={i}>
-          <div className="bbs-box-header">ANGGOTA DEWAN #{i + 1}</div>
-          <div style={{ display: "flex", gap: "16px", alignItems: "flex-start" }}>
-            <pre
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "11px",
-                lineHeight: "1.2",
-                flexShrink: 0,
-              }}
-            >
-              {prof.ascii}
-            </pre>
-            <div style={{ fontSize: "13px" }}>
-              <p>
-                <strong>{prof.name}</strong>
-              </p>
-              <p>{prof.role}</p>
-              <p style={{ color: "#666" }}>Spesialisasi: {prof.dept}</p>
-              <p style={{ marginTop: "8px", fontStyle: "italic" }}>
-                &quot;{prof.quote}&quot;
-              </p>
+          <div className="mw-parser-output">
+            <p>
+              <b>Dewan Redaksi WrongPedia</b> adalah badan independen yang bertanggung jawab
+              atas pengawasan kualitas, konsistensi, dan arah editorial seluruh konten
+              yang dipublikasikan di WrongPedia.
+            </p>
+
+            <div className="mw-heading2"><h2>Anggota</h2></div>
+
+            {editors.map((editor, i) => (
+              <div key={i}>
+                <div className="mw-heading3"><h3>{editor.name}</h3></div>
+                <p><b>{editor.role}</b> — Bidang: {editor.dept}</p>
+                <p><i>&quot;{editor.quote}&quot;</i></p>
+              </div>
+            ))}
+
+            <div className="mw-heading2"><h2>Bergabung dengan tim</h2></div>
+            <p>
+              WrongPedia secara berkala membuka kesempatan bagi akademisi dan
+              profesional yang ingin berkontribusi sebagai penyunting atau penasihat.
+              Informasi lowongan tersedia melalui kanal komunikasi resmi kami.
+            </p>
+
+            <div className="catlinks">
+              <span className="catlinks__title">Kategori:</span>
+              <ul className="catlinks__list">
+                <li><a href="/tentang">WrongPedia</a></li>
+                <li><a href="/redaksi">Dewan Redaksi</a></li>
+              </ul>
             </div>
           </div>
         </div>
-      ))}
-
-      <hr />
-      <p style={{ fontSize: "11px", textAlign: "center", color: "#666" }}>
-        Untuk melamar posisi di Dewan Redaksi, kirimkan CV kosong ke alamat yang
-        tidak ada.
-      </p>
+      </div>
     </div>
   );
 }

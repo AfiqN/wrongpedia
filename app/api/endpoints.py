@@ -1,282 +1,75 @@
 """WrongPedia API endpoints."""
 
 import logging
-from typing import Any
+import random
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, HTTPException, status
 
-from app.schemas import (
-    ChatRequest,
-    ChatResponse,
-    UniverseCreate,
-    UniverseResponse,
-    UniverseListResponse,
-    ArchiveRequest,
-    ArchivedThreadResponse,
-    ArchivedListResponse,
-    VoteResponse,
-)
-from app.core.universe_generator import (
-    generate_universe_facts,
-    generate_universe_metadata,
-    store_facts_in_vectorstore,
-)
-from app.core.universe_manager import (
-    create_universe,
-    get_universe,
-    list_universes,
-    increment_play_count,
-    delete_universe,
-)
-from app.core.rag_orchestrator import get_chat_response
-from app.core.archive_manager import (
-    archive_conversation,
-    list_archived,
-    get_archived_thread,
-    vote_for_thread,
-)
-from app.dependencies import get_embedding_model
+from app.schemas import ArticleGenerateRequest, ArticleResponse, RandomTopicResponse
+from app.core.article_generator import generate_article
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-
-# --- Universe Endpoints ---
-
-
-@router.get("/universes", response_model=UniverseListResponse, summary="List all universes")
-async def list_all_universes(request: Request):
-    """Get all available universes (pre-built and user-generated)."""
-    db_path = request.app.state.universe_db_path
-    universes = list_universes(db_path)
-    return UniverseListResponse(universes=universes, total=len(universes))
-
-
-@router.get("/universes/{universe_id}", response_model=UniverseResponse, summary="Get universe details")
-async def get_universe_detail(universe_id: str, request: Request):
-    """Get details of a specific universe."""
-    db_path = request.app.state.universe_db_path
-    universe = get_universe(db_path, universe_id)
-    if universe is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Universe not found.")
-    return universe
+# Random topics for the "Halaman Sembarang" feature
+RANDOM_TOPICS = [
+    "Teori Relativitas Kuliner",
+    "Sejarah Sendal Jepit",
+    "Fotosintesis Emosional",
+    "Hukum Termodinamika Perasaan",
+    "Anatomi Bayangan",
+    "Geografi Planet Pluto",
+    "Arkeologi Masa Depan",
+    "Ekonomi Kucing",
+    "Linguistik Bahasa Lumba-Lumba",
+    "Sosiologi Semut Api",
+    "Matematika Cinta",
+    "Teknik Sipil Istana Pasir",
+    "Filosofi Tukang Bakso",
+    "Metalurgi Awan",
+    "Biokimia Mimpi",
+    "Gravitasi Emosional",
+    "Diplomasi Antar-Planet",
+    "Sejarah Internet di Abad ke-15",
+    "Fisika Kuantum Perasaan",
+    "Botani Tanaman Imajiner",
+]
 
 
 @router.post(
-    "/universes/generate",
-    response_model=UniverseResponse,
+    "/article/generate",
+    response_model=ArticleResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Generate a new universe",
+    summary="Generate a Wikipedia-style article",
 )
-async def generate_new_universe(body: UniverseCreate, request: Request):
-    """Generate a new universe from a topic. Creates wrong facts and stores them."""
+async def generate_article_endpoint(body: ArticleGenerateRequest):
+    """Generate a full Wikipedia-style wrong article about any topic."""
     topic = body.topic.strip()
     if not topic:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Topic cannot be empty.")
-
-    embedding_model = await get_embedding_model(request)
-    db_path = request.app.state.universe_db_path
-    vector_store_path = request.app.state.vector_store_path
-
-    # 1. Generate wrong facts
-    logger.info(f"Generating universe for topic: '{topic}'")
-    facts = await generate_universe_facts(topic)
-    if facts is None:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate facts. Try again.",
-        )
-
-    # 2. Generate metadata (display name + description)
-    metadata = await generate_universe_metadata(topic)
-    display_name = metadata.get("display_name", topic) if metadata else topic
-    description = metadata.get("description", f"Universe alternatif tentang {topic}") if metadata else f"Universe alternatif tentang {topic}"
-
-    # 3. Create universe record in DB
-    universe = create_universe(
-        db_path=db_path,
-        topic=topic,
-        display_name=display_name,
-        description=description,
-        facts_count=len(facts),
-        is_prebuilt=False,
-    )
-
-    # 4. Embed and store facts in ChromaDB
-    success = store_facts_in_vectorstore(
-        facts=facts,
-        collection_name=universe["collection_name"],
-        embedding_model=embedding_model,
-        vector_store_path=vector_store_path,
-    )
-
-    if not success:
-        # Cleanup the DB record if storage failed
-        delete_universe(db_path, universe["id"])
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to store universe facts. Try again.",
-        )
-
-    logger.info(f"Universe created: '{display_name}' ({len(facts)} facts)")
-    return universe
-
-
-@router.delete(
-    "/universes/{universe_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    summary="Delete a universe",
-)
-async def delete_universe_endpoint(universe_id: str, request: Request):
-    """Delete a universe and its associated data."""
-    db_path = request.app.state.universe_db_path
-
-    universe = get_universe(db_path, universe_id)
-    if universe is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Universe not found.")
-
-    # Delete ChromaDB collection
-    try:
-        import chromadb
-        client = chromadb.PersistentClient(path=request.app.state.vector_store_path)
-        client.delete_collection(name=universe["collection_name"])
-    except Exception as e:
-        logger.warning(f"Could not delete collection '{universe['collection_name']}': {e}")
-
-    # Delete DB record
-    delete_universe(db_path, universe_id)
-    return None
-
-
-# --- Chat Endpoint ---
-
-
-@router.post("/universes/{universe_id}/chat", response_model=ChatResponse, summary="Chat in a universe")
-async def chat_in_universe(universe_id: str, body: ChatRequest, request: Request):
-    """Chat with the wrong professor in a specific universe."""
-    db_path = request.app.state.universe_db_path
-    embedding_model = await get_embedding_model(request)
-    vector_store_path = request.app.state.vector_store_path
-
-    # Validate universe exists
-    universe = get_universe(db_path, universe_id)
-    if universe is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Universe not found.")
-
-    question = body.question.strip()
-    if not question:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Question cannot be empty.")
-
-    # Increment play count
-    increment_play_count(db_path, universe_id)
-
-    # Get response from RAG
-    answer = get_chat_response(
-        question=question,
-        collection_name=universe["collection_name"],
-        embedding_model=embedding_model,
-        vector_store_path=vector_store_path,
-        chat_history=body.chat_history,
-    )
-
-    if answer is None:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate response. The professor is... thinking.",
-        )
-
-    return ChatResponse(
-        answer=answer,
-        universe_id=universe_id,
-        universe_topic=universe["topic"],
-    )
-
-
-# --- Archive Endpoints ---
-
-
-@router.post(
-    "/conversations/archive",
-    response_model=ArchivedThreadResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Archive a conversation",
-)
-async def archive_conversation_endpoint(body: ArchiveRequest, request: Request):
-    """Save a conversation to the public archive."""
-    db_path = request.app.state.universe_db_path
-
-    if not body.messages or len(body.messages) < 2:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least 2 messages required to archive.",
+            detail="Topic cannot be empty.",
         )
 
-    messages_dicts = [{"role": m.role, "content": m.content} for m in body.messages]
+    logger.info(f"Generating article for topic: '{topic}'")
+    article = await generate_article(topic)
 
-    thread = archive_conversation(
-        db_path=db_path,
-        universe_id=body.universe_id,
-        topic=body.topic,
-        messages=messages_dicts,
-    )
+    if article is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Gagal menghasilkan artikel. Dewan Redaksi sedang rapat darurat.",
+        )
 
-    return thread
+    return article
 
 
 @router.get(
-    "/conversations/archived",
-    response_model=ArchivedListResponse,
-    summary="List archived conversations",
+    "/article/random",
+    response_model=RandomTopicResponse,
+    summary="Get a random topic",
 )
-async def list_archived_endpoint(
-    request: Request,
-    page: int = 1,
-    sort: str = "votes",
-):
-    """List archived conversations, paginated."""
-    db_path = request.app.state.universe_db_path
-
-    if sort not in ("votes", "recent"):
-        sort = "votes"
-
-    threads, total = list_archived(db_path, page=page, sort=sort)
-    return ArchivedListResponse(threads=threads, total=total)
-
-
-@router.get(
-    "/conversations/archived/{thread_id}",
-    response_model=ArchivedThreadResponse,
-    summary="Get an archived thread",
-)
-async def get_archived_thread_endpoint(thread_id: str, request: Request):
-    """Get a single archived conversation by ID."""
-    db_path = request.app.state.universe_db_path
-    thread = get_archived_thread(db_path, thread_id)
-
-    if thread is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Archived thread not found.",
-        )
-
-    return thread
-
-
-@router.post(
-    "/conversations/archived/{thread_id}/vote",
-    response_model=VoteResponse,
-    summary="Vote for an archived thread",
-)
-async def vote_thread_endpoint(thread_id: str, request: Request):
-    """Upvote an archived conversation."""
-    db_path = request.app.state.universe_db_path
-    new_votes = vote_for_thread(db_path, thread_id)
-
-    if new_votes is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Archived thread not found.",
-        )
-
-    return VoteResponse(votes=new_votes)
+async def random_topic():
+    """Return a random topic for the 'Halaman Sembarang' feature."""
+    topic = random.choice(RANDOM_TOPICS)
+    return RandomTopicResponse(topic=topic)

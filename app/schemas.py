@@ -1,83 +1,46 @@
+"""WrongPedia API schemas."""
+
+from typing import List, Optional
 from pydantic import BaseModel
-from typing import Optional, List
-from datetime import datetime
 
 
-# --- Universe Schemas ---
-
-class UniverseBase(BaseModel):
-    """Base universe fields."""
-    topic: str
-    display_name: str
-    description: str
-
-
-class UniverseCreate(BaseModel):
-    """Request body for generating a new universe."""
+class ArticleGenerateRequest(BaseModel):
+    """Request to generate a new article."""
     topic: str
 
 
-class UniverseResponse(UniverseBase):
-    """Universe returned in API responses."""
+class InfoboxField(BaseModel):
+    label: str
+    value: str
+
+
+class Infobox(BaseModel):
+    title: str
+    fields: List[InfoboxField]
+
+
+class ArticleSection(BaseModel):
     id: str
-    facts_count: int
-    play_count: int
-    is_prebuilt: bool
-    created_at: datetime
-
-
-class UniverseListResponse(BaseModel):
-    """Response for listing universes."""
-    universes: List[UniverseResponse]
-    total: int
-
-
-# --- Chat Schemas ---
-
-class ChatMessage(BaseModel):
-    """A single message in chat history."""
-    role: str  # 'user' or 'assistant'
+    title: str
+    level: int = 2
     content: str
 
 
-class ChatRequest(BaseModel):
-    """Request body for chatting within a universe."""
-    question: str
-    chat_history: Optional[List[ChatMessage]] = None
+class ArticleReference(BaseModel):
+    id: int
+    text: str
 
 
-class ChatResponse(BaseModel):
-    """Chat response from the wrong professor."""
-    answer: str
-    universe_id: str
-    universe_topic: str
+class ArticleResponse(BaseModel):
+    """Full Wikipedia-style article response."""
+    title: str
+    hatnote: Optional[str] = None
+    lead: str
+    infobox: Infobox
+    sections: List[ArticleSection]
+    references: List[ArticleReference]
+    categories: List[str]
 
 
-# --- Archive Schemas ---
-
-class ArchiveRequest(BaseModel):
-    """Request body for archiving a conversation."""
-    universe_id: str
+class RandomTopicResponse(BaseModel):
     topic: str
-    messages: List[ChatMessage]
-
-
-class ArchivedThreadResponse(BaseModel):
-    """A single archived conversation thread."""
-    id: str
-    universe_id: str
-    topic: str
-    messages: List[ChatMessage]
-    votes: int
-    created_at: datetime
-
-
-class ArchivedListResponse(BaseModel):
-    """Response for listing archived threads."""
-    threads: List[ArchivedThreadResponse]
-    total: int
-
-
-class VoteResponse(BaseModel):
-    """Response after voting."""
-    votes: int

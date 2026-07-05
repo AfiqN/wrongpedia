@@ -6,111 +6,115 @@ export default function DonasiPage() {
   const [donated, setDonated] = useState(false);
 
   return (
-    <div>
-      <h2 style={{ fontSize: "18px", textAlign: "center" }}>
-        * DUKUNG WRONGPEDIA *
-      </h2>
-      <hr />
-
-      <div
-        className="bbs-box"
-        style={{ textAlign: "center", padding: "24px" }}
-      >
-        <p style={{ fontSize: "16px", fontWeight: "bold" }}>
-          Pembaca yang terhormat,
-        </p>
-        <p style={{ fontSize: "14px", marginTop: "12px", lineHeight: "1.8" }}>
-          Jika setiap pembaca WrongPedia menyumbangkan Rp 1.000, kami tetap
-          tidak akan memperbaiki informasi kami. Namun kami bisa membeli kopi
-          untuk Dewan Redaksi (yang sebenarnya tidak ada).
-        </p>
-        <p style={{ fontSize: "14px", marginTop: "12px", lineHeight: "1.8" }}>
-          Tanpa dukungan Anda, kami mungkin terpaksa mulai menulis fakta yang
-          benar. Bayangkan betapa membosankannya dunia itu.
-        </p>
-      </div>
-
-      <div className="bbs-box">
-        <div className="bbs-box-header">PROGRESS DONASI 2026</div>
-        <p style={{ fontSize: "12px", marginBottom: "4px" }}>
-          Target: Rp 847.291.000 | Terkumpul: Rp 12.500
-        </p>
-        <div
-          style={{
-            border: "1px solid var(--border-color)",
-            height: "20px",
-            width: "100%",
-            background: "#fff",
-          }}
-        >
-          <div
-            style={{
-              width: "1.5%",
-              height: "100%",
-              background: "var(--accent-red)",
-            }}
-          />
+    <div className="mw-page-container">
+      <div className="mw-header-tabs">
+        <div className="mw-header-tabs__left">
+          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Halaman</span>
+          <a href="/" className="mw-header-tabs__tab">Halaman Utama</a>
         </div>
-        <p style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>
-          1.5% tercapai (progress bar ini belum pernah bergerak sejak 2019)
-        </p>
-      </div>
-
-      {!donated ? (
-        <div style={{ textAlign: "center", margin: "24px 0" }}>
-          <button
-            className="btn-beveled"
-            style={{ fontSize: "16px", padding: "8px 24px" }}
-            onClick={() => setDonated(true)}
-          >
-            [ DONASI SEKARANG ]
-          </button>
+        <div className="mw-header-tabs__right">
+          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Baca</span>
+          <a href="/tentang" className="mw-header-tabs__tab">Tentang</a>
         </div>
-      ) : (
-        <div className="bbs-box" style={{ textAlign: "center" }}>
-          <p style={{ fontSize: "16px", fontWeight: "bold" }}>TERIMA KASIH!</p>
-          <p style={{ fontSize: "14px", marginTop: "8px" }}>
-            Donasi Anda sebesar Rp 0 telah kami terima dengan penuh haru.
-          </p>
-          <p style={{ fontSize: "14px", marginTop: "8px" }}>
-            Sebagai tanda terima kasih, Anda kini menyandang gelar kehormatan:
-          </p>
-          <p
-            style={{
-              fontSize: "14px",
-              fontWeight: "bold",
-              marginTop: "8px",
-              fontFamily: "var(--font-mono)",
-            }}
-          >
-            &quot;Dermawan Imajiner WrongPedia Kelas Bintang Tiga&quot;
-          </p>
-          <p style={{ fontSize: "12px", marginTop: "12px", color: "#666" }}>
-            (Gelar ini tidak diakui oleh institusi manapun termasuk WrongPedia sendiri)
-          </p>
-        </div>
-      )}
-
-      <div className="bbs-box">
-        <div className="bbs-box-header">TESTIMONIAL DONATUR</div>
-        <p style={{ fontSize: "13px", fontStyle: "italic", marginBottom: "8px" }}>
-          &quot;Sejak berdonasi ke WrongPedia, hidup saya tidak berubah sama
-          sekali.&quot; — Anonim, 2024
-        </p>
-        <p style={{ fontSize: "13px", fontStyle: "italic", marginBottom: "8px" }}>
-          &quot;Saya tidak pernah berdonasi tapi nama saya tetap muncul di
-          sini.&quot; — Dr. Budi, 2025
-        </p>
-        <p style={{ fontSize: "13px", fontStyle: "italic" }}>
-          &quot;Apakah ini penipuan? Saya rasa tidak, karena mereka tidak
-          meminta uang sungguhan.&quot; — Mahasiswa, 2026
-        </p>
       </div>
+      <div className="mw-content-container">
+        <div className="mw-body">
+          <h1 className="mw-first-heading">Dukung WrongPedia</h1>
+          <div className="mw-body-subheading">Dari WrongPedia bahasa Indonesia, ensiklopedia bebas</div>
 
-      <hr />
-      <p style={{ fontSize: "11px", textAlign: "center", color: "#666" }}>
-        WrongPedia Foundation adalah organisasi non-profit (karena memang tidak pernah menghasilkan profit).
-      </p>
+          <div className="mw-parser-output">
+            <p>
+              <b>Pembaca yang terhormat,</b> WrongPedia adalah proyek nirlaba yang
+              bergantung sepenuhnya pada dukungan pembaca. Tanpa sumbangan Anda,
+              kami tidak dapat mempertahankan server, membayar tim redaksi, dan
+              terus menyediakan akses pengetahuan terbuka bagi jutaan pembaca.
+            </p>
+            <p>
+              Jika setiap pembaca menyumbangkan sebesar secangkir kopi, kami
+              dapat memenuhi kebutuhan operasional selama satu tahun penuh.
+            </p>
+
+            <div className="mw-heading2"><h2>Kampanye penggalangan 2026</h2></div>
+            <p>Target tahunan: Rp 250.000.000 | Terkumpul: Rp 47.830.000 (19,1%)</p>
+            <div style={{
+              border: "1px solid var(--border-color-base)",
+              height: "16px",
+              width: "100%",
+              background: "var(--background-color-interactive-subtle)",
+              margin: "8px 0",
+              borderRadius: "2px",
+            }}>
+              <div style={{
+                width: "19%",
+                height: "100%",
+                background: "var(--color-progressive)",
+                borderRadius: "2px 0 0 2px",
+              }} />
+            </div>
+            <p style={{ fontSize: "12px", color: "var(--color-subtle)" }}>
+              Terakhir diperbarui: Juli 2026
+            </p>
+
+            <div className="mw-heading2"><h2>Alokasi dana</h2></div>
+            <ul>
+              <li><b>Infrastruktur server</b> — 45% dari total anggaran</li>
+              <li><b>Pengembangan platform</b> — 25% untuk pemeliharaan dan fitur baru</li>
+              <li><b>Program komunitas</b> — 20% untuk pelatihan kontributor</li>
+              <li><b>Operasional</b> — 10% untuk administrasi umum</li>
+            </ul>
+
+            {!donated ? (
+              <div style={{ textAlign: "center", margin: "24px 0" }}>
+                <button
+                  onClick={() => setDonated(true)}
+                  style={{
+                    padding: "8px 24px",
+                    background: "var(--color-progressive)",
+                    color: "#fff",
+                    border: "1px solid var(--color-progressive)",
+                    borderRadius: "2px",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Donasi Sekarang
+                </button>
+              </div>
+            ) : (
+              <div style={{
+                border: "1px solid var(--border-color-subtle)",
+                background: "var(--background-color-interactive-subtle)",
+                padding: "16px",
+                margin: "16px 0",
+                textAlign: "center"
+              }}>
+                <p style={{ fontSize: "16px", fontWeight: "bold" }}>Terima kasih atas dukungan Anda</p>
+                <p style={{ marginTop: "8px" }}>
+                  Kontribusi Anda telah dicatat. Bersama-sama kita menjaga pengetahuan
+                  tetap terbuka dan dapat diakses oleh semua orang.
+                </p>
+              </div>
+            )}
+
+            <div className="mw-heading2"><h2>Cara lain untuk berkontribusi</h2></div>
+            <ul>
+              <li>Menjadi penyunting sukarelawan</li>
+              <li>Menerjemahkan artikel ke bahasa daerah</li>
+              <li>Menyebarkan tautan WrongPedia di media sosial</li>
+              <li>Mengikuti program magang editorial</li>
+            </ul>
+
+            <div className="catlinks">
+              <span className="catlinks__title">Kategori:</span>
+              <ul className="catlinks__list">
+                <li><a href="/tentang">WrongPedia</a></li>
+                <li><a href="/donasi">Sumbangan</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

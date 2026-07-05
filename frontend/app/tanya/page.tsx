@@ -2,9 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import ChatContainer from "@/components/chat/ChatContainer";
+import DeskContainer from "@/components/desk/DeskContainer";
 
-function ChatContent() {
+function DeskContent() {
   const searchParams = useSearchParams();
   const initialQuestion = searchParams.get("q") || undefined;
 
@@ -12,18 +12,23 @@ function ChatContent() {
     <div className="mw-page-container">
       <div className="mw-header-tabs">
         <div className="mw-header-tabs__left">
-          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Tanya WrongBot</span>
+          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Meja Referensi</span>
           <a href="/" className="mw-header-tabs__tab">Halaman Utama</a>
         </div>
         <div className="mw-header-tabs__right">
-          <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Chat</span>
+          <a href="/tentang" className="mw-header-tabs__tab">Tentang</a>
           <a href="/kebijakan" className="mw-header-tabs__tab">Kebijakan</a>
         </div>
       </div>
 
       <div className="mw-content-container">
-        <div className="mw-body mw-body--chat">
-          <ChatContainer initialQuestion={initialQuestion} />
+        <div className="mw-body">
+          <h1 className="mw-first-heading">WrongPedia:Meja Referensi</h1>
+          <div className="mw-body-subheading">Dari WrongPedia bahasa Indonesia, ensiklopedia bebas</div>
+
+          <div className="mw-parser-output">
+            <DeskContainer initialQuestion={initialQuestion} />
+          </div>
         </div>
       </div>
     </div>
@@ -41,7 +46,7 @@ export default function TanyaPage() {
         </div>
       </div>
     }>
-      <ChatContent />
+      <DeskContent />
     </Suspense>
   );
 }

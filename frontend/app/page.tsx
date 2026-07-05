@@ -75,13 +75,13 @@ export default function HomePage() {
             <input
               type="text"
               className="home-search-section__input"
-              placeholder="Tanyakan apa saja kepada WrongBot..."
+              placeholder="Ajukan pertanyaan ke Meja Referensi..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              aria-label="Tanya WrongBot"
+              aria-label="Meja Referensi"
             />
             <button type="submit" className="home-search-section__btn home-search-section__btn--primary" disabled={loading}>
-              Tanya WrongBot
+              Tanya Meja Referensi
             </button>
           </form>
           {loading && loadingMsg && (

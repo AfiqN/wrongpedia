@@ -113,7 +113,7 @@ export default function ArticlePage() {
         </div>
         <div className="mw-header-tabs__right">
           <span className="mw-header-tabs__tab mw-header-tabs__tab--active">Baca</span>
-          <a href="/tanya" className="mw-header-tabs__tab">Tanya AI</a>
+          <a href="/tanya" className="mw-header-tabs__tab">Meja Referensi</a>
         </div>
       </div>
 

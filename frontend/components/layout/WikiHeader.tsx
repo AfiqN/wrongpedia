@@ -53,7 +53,7 @@ export default function WikiHeader() {
       <div className="vector-header__end">
         <a href="/donasi">Sumbangan</a>
         <a href="/tentang">Tentang</a>
-        <a href="/tanya">Tanya AI</a>
+        <a href="/tanya">Meja Referensi</a>
       </div>
     </header>
   );
